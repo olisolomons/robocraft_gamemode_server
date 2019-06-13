@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/olisolomons/robocraft_gamemode_server#readme",
   "dependencies": {
+    "discord.js": "^11.5.1",
     "express": "^4.17.1"
   }
 }
