@@ -1,3 +1,7 @@
+# Intellij
+.idea
+robocraft_gamemode_server.iml
+
 # Logs
 logs
 *.log
