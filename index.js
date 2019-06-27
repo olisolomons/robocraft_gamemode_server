@@ -28,14 +28,12 @@ client.on("message", async (message) => {
             await message.channel.send('You are not worthy of this permission!');
             return;
         }
-        }
         try {
             await db.runAsync('INSERT INTO channels VALUES (?)', message.channel.id);
             await message.channel.send('Enabled!');
         } catch (err) {
             await message.channel.send('It was already enabled!');
         }
-        await message.channel.send(JSON.stringify(await db.allAsync('SELECT * FROM channels')));
     }
     if (message.content.startsWith("!disable_robocraft_gamemode")) {
         if (!message.member.hasPermission("ADMINISTRATOR")) {
@@ -44,7 +42,6 @@ client.on("message", async (message) => {
         }
         await db.runAsync('DELETE FROM channels WHERE id=?', message.channel.id);
         await message.channel.send('Disabled!');
-        await message.channel.send(JSON.stringify(await db.allAsync('SELECT * FROM channels')));
     }
 });
 
