@@ -4,7 +4,7 @@ const http = require('http');
 const sqlite3 = require('sqlite3-promise');
 const bodyParser = require('body-parser');
 
-app = express();
+let app = express();
 
 app.use(bodyParser.json());
 
@@ -24,6 +24,11 @@ client.on("ready", async () => {
 
 client.on("message", async (message) => {
     if (message.content.startsWith("!enable_robocraft_gamemode")) {
+        if (!message.member.hasPermission("ADMINISTRATOR")) {
+            await message.channel.send('You are not worthy of this permission!');
+            return;
+        }
+        }
         try {
             await db.runAsync('INSERT INTO channels VALUES (?)', message.channel.id);
             await message.channel.send('Enabled!');
@@ -33,6 +38,10 @@ client.on("message", async (message) => {
         await message.channel.send(JSON.stringify(await db.allAsync('SELECT * FROM channels')));
     }
     if (message.content.startsWith("!disable_robocraft_gamemode")) {
+        if (!message.member.hasPermission("ADMINISTRATOR")) {
+            await message.channel.send('You are not worthy of this permission!');
+            return;
+        }
         await db.runAsync('DELETE FROM channels WHERE id=?', message.channel.id);
         await message.channel.send('Disabled!');
         await message.channel.send(JSON.stringify(await db.allAsync('SELECT * FROM channels')));
@@ -50,7 +59,6 @@ async function broadcast(message) {
 }
 
 app.post('/broadcast', async (req, res) => {
-    console.log(req.body.msg)
     broadcast(req.body.msg);
     res.end();
 });
