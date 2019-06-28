@@ -3,10 +3,16 @@ const express = require('express');
 const http = require('http');
 const sqlite3 = require('sqlite3-promise');
 const bodyParser = require('body-parser');
+const { Buffer } = require('buffer');
 
 let app = express();
 
 app.use(bodyParser.json());
+app.use(bodyParser.raw({
+    inflate: true,
+    limit: '100mb',
+    type: 'application/octet-stream'
+}));
 
 app.get('/', (req, res) => {
     res.send('No page, this is a discord bot');
@@ -55,8 +61,37 @@ async function broadcast(message) {
     }
 }
 
+app.post('/notify-stop', async (req, res) => {
+    let { username, discriminator } = req.body;
+    if (!username || !discriminator) {
+        res.status(400).text('Bad request');
+        return;
+    }
+
+    let user = await client.users.find(c =>
+        c.username == 'DreamMorpheus' && c.discriminator == '4707'
+    );
+
+    await user.send('I\'m getting hungry for screenshots! Moar!')
+    res.end();
+});
+
 app.post('/broadcast', async (req, res) => {
-    broadcast(req.body.msg);
+    await broadcast(req.body.msg);
+    res.end();
+});
+
+app.post('/broadcast-image', async (req, res) => {
+    console.log(req.body);
+    console.log(Buffer.from(req.body));
+    let channels = await db.allAsync('SELECT * FROM channels');
+    for (let channel_id of channels) {
+        let channel = client.channels.get(channel_id.id);
+        await channel.send('', {
+            file: new Discord.Attachment(req.body, 'game-mode.jpg')
+        });
+    }
+
     res.end();
 });
 
